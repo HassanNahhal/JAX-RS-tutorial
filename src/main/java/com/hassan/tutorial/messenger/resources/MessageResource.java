@@ -2,6 +2,7 @@ package com.hassan.tutorial.messenger.resources;
 
 import java.util.List;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -14,6 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.hassan.tutorial.messenger.model.Message;
+import com.hassan.tutorial.messenger.resources.beans.MessageFilterBean;
 import com.hassan.tutorial.messenger.service.MessageService;
 
 @Path("/messages")
@@ -24,16 +26,32 @@ public class MessageResource {
      MessageService messageService = new MessageService();
      
      @GET
-     public List<Message> getMessages(@QueryParam("year") int year,
-                                      @QueryParam("start") int start,
-                                      @QueryParam("size") int size) {
-          if (year > 0)
-               return messageService.getAllMessagesForYear(year);
-          if (start >= 0 && size >= 0)
-               return messageService.getAllMessagesPaginated(start, size);
+     public List<Message> getMessages(@BeanParam MessageFilterBean filterbean) {
+          if (filterbean.getYear() > 0)
+               return messageService.getAllMessagesForYear(filterbean.getYear());
+          if (filterbean.getStart() >= 0 && filterbean.getSize() >= 0)
+               return messageService.getAllMessagesPaginated(filterbean.getStart(),
+                                                             filterbean.getSize());
           return messageService.getAllMessages();
      }
      
+     /**
+      * @param year
+      * @param start
+      * @param size
+      * @return list of messages based on the params given
+      * @comment this is the hard way, to simplify it see the other getMessages method
+      */
+     /*
+      * @GET public List<Message> getMessages(@QueryParam("year") int year,
+      * 
+      * @QueryParam("start") int start,
+      * 
+      * @QueryParam("size") int size) { if (year > 0) return
+      * messageService.getAllMessagesForYear(year); if (start >= 0 && size >= 0) return
+      * messageService.getAllMessagesPaginated(start, size); return messageService.getAllMessages();
+      * }
+      */
      @PUT
      @Path("/{messageId}")
      public Message updateMessage(@PathParam("messageId") long id,
